@@ -1,0 +1,16 @@
+  293  pwd
+  294  sudo git clone git@github.com:brlopes/OPENGL_windwheel.git
+  295  pwd
+  296  cd OPENGL_snowstorm
+  297  git add .
+  298  git status
+  299  git init
+  300  git add .
+  301  git status
+  302  git add .
+  303  git status
+  304  git commit -m "OpenGL Snow Storm initial push"
+  305  history | grep git
+  306  pwd
+  307  touch log
+  308  cat history > log
