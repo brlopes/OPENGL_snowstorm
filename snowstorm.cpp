@@ -229,12 +229,50 @@ GLvoid drawCone(void)
 	glDisable(GL_BLEND);        // Turn Blending Off
 	glEnable(GL_DEPTH_TEST);    // Turn Depth Testing On
 }
-//=========================================================//
-//=========================================================//
-GLvoid DrawNormalObjects(GLfloat rotation)
+
+// func for generating random float for snow pos
+float RandomFloat(float min, float max)
 {
-  // make sure the random color values we get are the same every time
-  srand(200);
+	float r = (float)rand() / (float)RAND_MAX;
+	return min + r * (max - min);
+	//return 1.0;
+}
+
+GLvoid drawSnow(GLfloat snowloc)
+{
+	GLfloat alphaTransparency = 0.6;
+	int max_snow = 10;
+	// enable blending for transparent cylinder
+	glEnable(GL_BLEND);     // Turn Blending On
+	glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	  //for (float x = 0.0; x > max_snow; x += 1)
+	  //{
+		  glPushMatrix();
+		  	  glColor4f(1.0f,1.0f,1.0f,alphaTransparency);
+		  	  //glColor3f(1.0f, 1.0f, 1.0f);
+			  glTranslatef(RandomFloat(-20.0, 20.0), snowloc + rand() % 70, RandomFloat(-20.0, 20.0));
+			  glutSolidSphere(0.03, 6, 6);
+		  glPopMatrix();
+	  //}
+
+		  //glPushMatrix();
+			//glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+		//	glColor4f(0.0f,1.0f,0.0f,alphaTransparency);
+			//glTranslatef(-5.0, 0.0, -5.0);
+			//glRotatef(-90, 1.0, 0.0, 0.0);
+			//gluCylinder(g_normalObject, 1.0, 0.0, 3.0, 32, 4);
+		  //glPopMatrix();
+
+	glDisable(GL_BLEND);        // Turn Blending Off
+	glEnable(GL_DEPTH_TEST);    // Turn Depth Testing On
+}
+//=========================================================//
+//=========================================================//
+GLvoid DrawNormalObjects(GLfloat rotation, GLfloat snowloc, GLfloat snowloc2)
+{
+
 
   // save the existing color properties
   glPushAttrib(GL_CURRENT_BIT);
@@ -243,8 +281,20 @@ GLvoid DrawNormalObjects(GLfloat rotation)
   //drawCone();
   //drawTransparentCylinder();
 
+  // start snow
+  // use snowloc for changing direction
+  // 200 * 2 snowflakes
+  int max_snow = 1000;
 
+  for (int n=max_snow; n>0; n--) {
+    drawSnow(snowloc);
+  }
 
+  for (int n=max_snow; n>0; n--) {
+	  drawSnow(snowloc2);
+  }
+  // make sure the random color values we get are the same every time
+  srand(200);
   // tree #1
   glPushMatrix();
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
@@ -282,6 +332,27 @@ GLvoid DrawNormalObjects(GLfloat rotation)
     glRotatef(0, 0.0, 1.0, 0.0);
     gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
   glPopMatrix();
+
+  // tree #3
+  glPushMatrix();
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3ub(102,51,0);
+    glTranslatef(10.0, -2.0, -8.0);
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.5, 0.5, 4.0, 32, 4);
+
+    glColor3ub(0,128,0);
+    glTranslatef(0.0, 0.0, 4.0);
+    glRotatef(0, 0.0, 1.0, 0.0);
+    gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
+
+    glColor3ub(0,128,0);
+    glTranslatef(0.0, 0.0, 1.0);
+    glRotatef(0, 0.0, 1.0, 0.0);
+    gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
+  glPopMatrix();
+
+
 
   // a tapered cylinder
 //  glPushMatrix();
@@ -331,14 +402,23 @@ static void display(void)
 
     // rotation is used for animation
     static GLfloat rotation = 0.0;
+    static GLfloat snowloc = 5.0;
+    static GLfloat snowloc2 = snowloc + 50.0;
     // it's increased by one every frame
     rotation += 1.0;
+    snowloc -= 0.1;
+    snowloc2 -= 0.1;
     // and ranges between 0 and 360
     if (rotation > 360.0)
     rotation = 0.0;
 
+    if (snowloc < -50.0)
+    snowloc = 60.0;
+
+    if (snowloc2 < -80.0)
+    snowloc2 = snowloc + 50.0;
     // draw all of our objects in their normal position
-    DrawNormalObjects(rotation);
+    DrawNormalObjects(rotation, snowloc, snowloc2);
 
 
     //glDisable(GL_LIGHTING);
