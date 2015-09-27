@@ -72,6 +72,12 @@ GLUquadricObj *g_wireframeObject  = NULL;
 GLUquadricObj *g_flatshadedObject = NULL;
 void cleanUP_data(void);
 
+// windwheel
+float rotateBase_degrees=0;
+float wheelRotateFactor=1.0;
+float rotatePointer_degrees=0;
+
+
 const int   WORLD_SIZE = 250;
 //=========================================================//
 //=========================================================//
@@ -143,7 +149,7 @@ GLvoid DrawGround()
 	glEnd();
 
 	//draw lines for depth
-//	glColor3f(0.5f, 0.7f, 1.0f);
+//	glColor3f(0, 102.7f, 204.0f);
 //	glBegin(GL_LINES);
 //		for (int x = -WORLD_SIZE; x < WORLD_SIZE; x += 6)
 //		{
@@ -229,12 +235,94 @@ GLvoid drawCone(void)
 	glDisable(GL_BLEND);        // Turn Blending Off
 	glEnable(GL_DEPTH_TEST);    // Turn Depth Testing On
 }
-//=========================================================//
-//=========================================================//
-GLvoid DrawNormalObjects(GLfloat rotation)
+
+// func for generating random float for snow pos
+float RandomFloat(float min, float max)
 {
-  // make sure the random color values we get are the same every time
-  srand(200);
+	float r = (float)rand() / (float)RAND_MAX;
+	return min + r * (max - min);
+	//return 1.0;
+}
+
+GLvoid drawSnow(GLfloat snowloc)
+{
+	GLfloat alphaTransparency = 0.6;
+	int max_snow = 10;
+	// enable blending for transparent cylinder
+	glEnable(GL_BLEND);     // Turn Blending On
+	glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	  //for (float x = 0.0; x > max_snow; x += 1)
+	  //{
+		  glPushMatrix();
+		  	  glColor4f(1.0f,1.0f,1.0f,alphaTransparency);
+		  	  //glColor3f(1.0f, 1.0f, 1.0f);
+			  glTranslatef(RandomFloat(-20.0, 20.0), snowloc + rand() % 70, RandomFloat(-20.0, 20.0));
+			  glutSolidSphere(0.03, 6, 6);
+		  glPopMatrix();
+	  //}
+
+		  //glPushMatrix();
+			//glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+		//	glColor4f(0.0f,1.0f,0.0f,alphaTransparency);
+			//glTranslatef(-5.0, 0.0, -5.0);
+			//glRotatef(-90, 1.0, 0.0, 0.0);
+			//gluCylinder(g_normalObject, 1.0, 0.0, 3.0, 32, 4);
+		  //glPopMatrix();
+
+	glDisable(GL_BLEND);        // Turn Blending Off
+	glEnable(GL_DEPTH_TEST);    // Turn Depth Testing On
+}
+//=========================================================//
+void drawColorFan(GLfloat radius, int sections)
+{
+	//DRAWS A WHEEL WITH RAINBOW COLORS FOR SECTIONS
+
+	//define light so rotation doesn't change the matrix
+	GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 0};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+
+    glBegin(GL_TRIANGLE_FAN);
+        int i;
+        glVertex2f(0.0, 0.0);
+        for(i = 0; i <= sections;i++) {
+
+        	//circle-like triangle fan
+            glVertex2f(radius*cos(i*2.0 * 3.14159 / sections),
+                       radius*sin(i*2.0 * 3.14159 / sections));
+
+            //set color sections
+            switch (i%6)
+            {
+            case 0:
+                glColor3f(1.0f, 0.0f, 0.0f);
+                break;
+            case 1:
+                glColor3f(1.0f, 0.5f, 0.0f);
+                break;
+            case 2:
+                glColor3f(1.0f, 1.0f, 0.0f);
+                break;
+            case 3:
+                glColor3f(0.0f, 1.0f, 0.0f);
+                break;
+            case 4:
+                glColor3f(0.0f, 0.0f, 1.0f);
+                break;
+            case 5:
+                glColor3f(1.0f, 0.0f, 1.0f);
+                break;
+            }
+        }
+
+    glEnd();
+}
+
+//=========================================================//
+GLvoid DrawNormalObjects(GLfloat rotation, GLfloat snowloc, GLfloat snowloc2)
+{
+
 
   // save the existing color properties
   glPushAttrib(GL_CURRENT_BIT);
@@ -243,13 +331,27 @@ GLvoid DrawNormalObjects(GLfloat rotation)
   //drawCone();
   //drawTransparentCylinder();
 
+  // start snow
+  // use snowloc for changing direction
+  // 200 * 2 snowflakes
+  int max_snow = 1000;
+
+  for (int n=max_snow; n>0; n--) {
+    drawSnow(snowloc);
+  }
+
+  for (int n=max_snow; n>0; n--) {
+	  drawSnow(snowloc2);
+  }
+  // make sure the random color values we get are the same every time
+  srand(200);
 
 
   // tree #1
   glPushMatrix();
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
-    glColor3ub(102,51,0);
-    glTranslatef(0.0, -2.0, -4.0);
+    glColor3ub(102,0,0);
+    glTranslatef(-2.0, -2.0, -14.0);
     glRotatef(-90, 1.0, 0.0, 0.0);
     gluCylinder(g_normalObject, 0.5, 0.5, 4.0, 32, 4);
 
@@ -267,8 +369,8 @@ GLvoid DrawNormalObjects(GLfloat rotation)
   // tree #2
   glPushMatrix();
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
-    glColor3ub(102,51,0);
-    glTranslatef(5.0, -2.0, -4.0);
+    glColor3ub(0,51,0);
+    glTranslatef(-5.0, -2.0, -10.0);
     glRotatef(-90, 1.0, 0.0, 0.0);
     gluCylinder(g_normalObject, 0.5, 0.5, 4.0, 32, 4);
 
@@ -283,38 +385,106 @@ GLvoid DrawNormalObjects(GLfloat rotation)
     gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
   glPopMatrix();
 
-  // a tapered cylinder
-//  glPushMatrix();
-//    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
-//    glColor3f(1,0,0);
-//    glTranslatef(5.0, 0.0, 3.0);
-//    glRotatef(-90, 1.0, 0.0, 0.0);
-//    gluCylinder(g_normalObject, 2.0, 0.5, 2.0, 32, 4);
-//  glPopMatrix();
+  // tree #3
+  glPushMatrix();
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3ub(102,51,0);
+    glTranslatef(-10.0, -2.0, -8.0);
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.5, 0.5, 4.0, 32, 4);
 
-  // a disk with a hole in it
-//  glPushMatrix();
-//    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
-//    glColor3f(1,1,0);
-//    glTranslatef(50.0, 1.5, -20.0);
-//    glRotatef(rotation * 10.0f, 0.0, 1.0, 0.0);
-//    gluDisk(g_normalObject, 0.7, 1.0, 32, 4);
-//  glPopMatrix();
+    glColor3ub(0,128,0);
+    glTranslatef(0.0, 0.0, 4.0);
+    glRotatef(0, 0.0, 1.0, 0.0);
+    gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
+
+    glColor3ub(0,128,0);
+    glTranslatef(0.0, 0.0, 1.0);
+    glRotatef(0, 0.0, 1.0, 0.0);
+    gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
+  glPopMatrix();
 
 
-  // a bouncing sphere
-//  glPushMatrix();
-//    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
-//    glColor3f(1,0,1);
-//
-//    // use a sine wave pattern to make the sphere look like it's bouncing
-//    glTranslatef(5.0f, 3.0f + (float)sin(float(3.14159f*rotation/90.0f)), 50.0f);
-//    gluSphere(g_normalObject, 2.0f, 32, 20);
-//  glPopMatrix();
 
-  // restore the previous color values
+  glPushMatrix();
+    //STEM cylinder
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3f(0,1,1);
+    glTranslatef(20, -5, -18);
+    glRotatef(-90, 1.0, 0.0, 0);
+    glRotatef(rotateBase_degrees, 0.0, 0.0, 1.0);
+    gluCylinder(g_flatshadedObject, 0.5, 0.5, 10.0, 32, 4);
+
+    //pipe on disks
+    glTranslatef(0, 0, 9);
+    glRotatef(-270, 1, 0, 0);
+    gluCylinder(g_flatshadedObject, 0.4, 0.4, 4.0, 32, 4);
+
+    //large windwheel
+    glColor3f(1,0,0);
+    glTranslatef(0,0,1);
+    glRotatef(rotation * 3.0f * wheelRotateFactor, 0.0, 0.0, 1.0);
+    drawColorFan(4, 36); // radius is 5, 36 is num triangles
+
+    //medium wheel
+    glColor3f(0,1,0);
+    glTranslatef(0,0,1);
+    glRotatef(rotation * -3.50f * wheelRotateFactor, 0.0, 0.0, 1.0);
+    drawColorFan(3, 36);
+
+    //small wheel
+    glTranslatef(0,0,1);
+    glRotatef(rotation * 0.25f * wheelRotateFactor, 0.0, 0.0, 1.0);
+    drawColorFan(2, 36);
+  glPopMatrix();
+
+
+  // snowman
+  glPushMatrix();
+
+  	//belly
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3f(1,0.3,1);
+    glTranslatef(0.0f, -1.0f, -6.0f);
+    glRotatef(-90, 1.0f, 0.0f, 0.0f);
+    gluSphere(g_flatshadedObject, 1.0f, 16, 16);
+
+    //torso
+    glColor3f(1,0.4,1);
+    glTranslatef(0, 0, 1);
+    glRotatef(90, 1.0f, 0.0f, 0.0f);
+    gluSphere(g_flatshadedObject, 0.75f, 16, 16);
+
+    //head
+    glColor3f(1,0.5,1);
+    glTranslatef(0, 1, 0);
+    glRotatef(90, 1.0f, 0.0f, 0.0f);
+    gluSphere(g_flatshadedObject, 0.5f, 16, 16);
+  glPopMatrix();
+
+
+  //hat
+  glPushMatrix();
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3f(0,0,1);
+    glTranslatef(0.0, 1.4, -6.0);
+    glRotatef(90.0, 1.0, 0.0, 0.0);
+    gluDisk(g_normalObject, 0.1, 0.5, 32, 4); //bot disk
+  glPopMatrix();
+
+  glPushMatrix();
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3f(0,0,1);
+    glTranslatef(0.0, 1.4, -6.0);
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.3, 0.3, 0.4, 32, 4); //top cylinder
+  glPopMatrix();
+
+
+
   glPopAttrib();
 }
+
 
 //=========================================================//
 
@@ -331,14 +501,23 @@ static void display(void)
 
     // rotation is used for animation
     static GLfloat rotation = 0.0;
+    static GLfloat snowloc = 5.0;
+    static GLfloat snowloc2 = snowloc + 50.0;
     // it's increased by one every frame
     rotation += 1.0;
+    snowloc -= 0.1;
+    snowloc2 -= 0.1;
     // and ranges between 0 and 360
     if (rotation > 360.0)
     rotation = 0.0;
 
+    if (snowloc < -50.0)
+    snowloc = 60.0;
+
+    if (snowloc2 < -80.0)
+    snowloc2 = snowloc + 50.0;
     // draw all of our objects in their normal position
-    DrawNormalObjects(rotation);
+    DrawNormalObjects(rotation, snowloc, snowloc2);
 
 
     //glDisable(GL_LIGHTING);
@@ -354,6 +533,34 @@ static void keyboard(unsigned char key, int x, int y)
 { int number=-1;
 
     move_camera(number,key);
+
+    switch (key)
+       {
+          case 'l':
+              rotateBase_degrees--;
+              break;
+          case 'L':
+              rotateBase_degrees--;
+              break;
+          case 'r':
+              rotateBase_degrees++;
+              break;
+          case 'R':
+              rotateBase_degrees++;
+              break;
+          case '1':
+              wheelRotateFactor=1.0;
+              break;
+          case '2':
+              wheelRotateFactor=2.0;
+              break;
+          case '3':
+              wheelRotateFactor=3.0;
+              break;
+          default:
+              break;
+       }
+
 
     glutPostRedisplay();
 }

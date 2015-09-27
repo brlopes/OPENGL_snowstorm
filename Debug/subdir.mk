@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../task2.cpp 
+../snowstorm.cpp 
 
 OBJS += \
-./task2.o 
+./snowstorm.o 
 
 CPP_DEPS += \
-./task2.d 
+./snowstorm.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

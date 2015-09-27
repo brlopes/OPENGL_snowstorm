@@ -1,0 +1,1 @@
+snowstorm.d: ../snowstorm.cpp
