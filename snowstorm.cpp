@@ -226,11 +226,24 @@ GLvoid drawCone(void)
 
 		  glPushMatrix();
 			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
-			glColor4f(0.0f,1.0f,0.0f,alphaTransparency);
-			glTranslatef(-5.0, 0.0, -5.0);
+			glColor3f(1,0.6,0);
+			glTranslatef(0.0, 0.4, 0);
 			glRotatef(-90, 1.0, 0.0, 0.0);
-			gluCylinder(g_normalObject, 1.0, 0.0, 3.0, 32, 4);
+			gluCylinder(g_normalObject, 0.15, 0.0, 0.4, 32, 8);
 		  glPopMatrix();
+
+
+//		  glPushMatrix();
+//			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+//			glColor3f(0,0,0);
+//			glTranslatef(0.0, 0.4, 2);
+//			glRotatef(-90, 1.0, 0.0, 0.0);
+//			gluCylinder(g_normalObject, 0.15, 0.15, 0.5, 32, 8);
+//		  glPopMatrix();
+
+
+
+
 
 	glDisable(GL_BLEND);        // Turn Blending Off
 	glEnable(GL_DEPTH_TEST);    // Turn Depth Testing On
@@ -351,7 +364,7 @@ GLvoid DrawNormalObjects(GLfloat rotation, GLfloat snowloc, GLfloat snowloc2)
   glPushMatrix();
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
     glColor3ub(102,0,0);
-    glTranslatef(-2.0, -2.0, -14.0);
+    glTranslatef(2.0, -2.0, -14.0);
     glRotatef(-90, 1.0, 0.0, 0.0);
     gluCylinder(g_normalObject, 0.5, 0.5, 4.0, 32, 4);
 
@@ -404,7 +417,24 @@ GLvoid DrawNormalObjects(GLfloat rotation, GLfloat snowloc, GLfloat snowloc2)
     gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
   glPopMatrix();
 
+  // tree #4
+  glPushMatrix();
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+    glColor3ub(102,51,0);
+    glTranslatef(6.0, -2.0, -11.0);
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.5, 0.5, 4.0, 32, 4);
 
+    glColor3ub(0,128,0);
+    glTranslatef(0.0, 0.0, 4.0);
+    glRotatef(0, 0.0, 1.0, 0.0);
+    gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
+
+    glColor3ub(0,128,0);
+    glTranslatef(0.0, 0.0, 1.0);
+    glRotatef(0, 0.0, 1.0, 0.0);
+    gluCylinder(g_normalObject, 2.0, 0.0, 6.0, 32, 2);
+  glPopMatrix();
 
   glPushMatrix();
     //STEM cylinder
@@ -460,24 +490,74 @@ GLvoid DrawNormalObjects(GLfloat rotation, GLfloat snowloc, GLfloat snowloc2)
     glTranslatef(0, 1, 0);
     glRotatef(90, 1.0f, 0.0f, 0.0f);
     gluSphere(g_flatshadedObject, 0.5f, 16, 16);
+
+    // nose
+    drawCone();
+
+  //body details
+  glPushMatrix();
+    //eyes front:
+	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
+	glColor3f(0,0,0);
+	glTranslatef(-0.2, 0.45, -0.2);
+	glRotatef(-90.0, 1.0, 0.0, 0.0);
+	gluDisk(g_normalObject, 0.01, 0.1, 32, 4); // iris1
+	//back:
+	glTranslatef(0, 0, -0.1);
+    glRotatef(0, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.1, 0.1, 0.1, 32, 4);
+
+    //front:
+	glColor4f(0,0,0,0.5);
+	glTranslatef(0.4, 0, 0.1);
+	gluDisk(g_normalObject, 0.01, 0.1, 32, 4); // iris2
+	//back:
+	glTranslatef(0, 0, -0.1);
+    glRotatef(0, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.1, 0.1, 0.1, 32, 4);
   glPopMatrix();
 
 
-  //hat
+  glPushMatrix();
+    //buttons
+  	//front:
+	glColor4f(1,0,0,0.5);
+	glTranslatef(0, 0.8, 1);
+	glRotatef(-90.0, 1.0, 0.0, 0.0);
+	gluDisk(g_normalObject, 0.01, 0.1, 32, 4); // iris2
+	//back:
+	glTranslatef(0, 0, -0.1);
+    glRotatef(0, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.1, 0.1, 0.1, 32, 4);
+
+	glColor4f(1,0,0,0.5);
+	glTranslatef(0, 0.4, 0);
+	gluDisk(g_normalObject, 0.01, 0.1, 32, 4); // iris2
+	//back:
+	glTranslatef(0, 0, -0.1);
+    glRotatef(0, 1.0, 0.0, 0.0);
+    gluCylinder(g_normalObject, 0.1, 0.1, 0.1, 32, 4);
+  glPopMatrix();
+glPopMatrix();
+//end of snowman
+
+
+  //hat disk:
   glPushMatrix();
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
     glColor3f(0,0,1);
     glTranslatef(0.0, 1.4, -6.0);
     glRotatef(90.0, 1.0, 0.0, 0.0);
-    gluDisk(g_normalObject, 0.1, 0.5, 32, 4); //bot disk
+    gluDisk(g_normalObject, 0.1, 0.5, 32, 4); // note inner
   glPopMatrix();
 
+  //hat top:
   glPushMatrix();
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, rand() % 128);
     glColor3f(0,0,1);
     glTranslatef(0.0, 1.4, -6.0);
     glRotatef(-90, 1.0, 0.0, 0.0);
-    gluCylinder(g_normalObject, 0.3, 0.3, 0.4, 32, 4); //top cylinder
+    gluCylinder(g_normalObject, 0.3, 0.3, 0.4, 32, 4);
   glPopMatrix();
 
 
